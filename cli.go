@@ -16,6 +16,7 @@ func main() {
 			Aliases: []string{"d"},
 			Usage:   "Manage devices",
 			Subcommands: []cli.Command{
+				{Name: "find", Aliases: []string{"f"}, Action: FindDevices},
 				{Name: "switch", Aliases: []string{"s"}, Action: SwitchDevice},
 				{Name: "list", Aliases: []string{"l", "ls"}, Action: ListDevices},
 				{Name: "create", Aliases: []string{"c"}, Action: CreateDevice},

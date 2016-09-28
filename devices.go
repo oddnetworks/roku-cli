@@ -3,8 +3,47 @@ package main
 import (
 	"fmt"
 	"gopkg.in/urfave/cli.v1"
+	"net"
+	"net/http"
 	"strconv"
+	"strings"
+	"time"
 )
+
+func FindDevices(c *cli.Context) error {
+	conn, err := net.Dial("udp", "8.8.8.8:80")
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+
+	address := conn.LocalAddr().String()
+	localip := net.ParseIP(address[0:strings.LastIndex(address, ":")]).To4()
+
+	results := make(chan string, 255)
+	for n := 1; n <= 254; n++ {
+		go func(node int, results chan<- string) {
+			remoteip := net.IPv4(localip[0], localip[1], localip[2], byte(node))
+
+			timeout := time.Duration(1 * time.Second)
+			client := http.Client{Timeout: timeout}
+			res, err := client.Get("http://" + remoteip.String())
+			if err == nil && strings.Contains(res.Header.Get("Www-Authenticate"), "rokudev") {
+				results <- remoteip.String()
+			} else {
+				results <- ""
+			}
+		}(n, results)
+	}
+	for n := 1; n <= 254; n++ {
+		ip := <-results
+		if ip != "" {
+			fmt.Println(ip)
+		}
+	}
+
+	return nil
+}
 
 func SwitchDevice(c *cli.Context) error {
 	rc := NewRC()
