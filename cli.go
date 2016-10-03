@@ -58,8 +58,15 @@ func main() {
 			},
 		},
 		{
-			Name:  "build",
-			Usage: "Build a .zip of the app for submission to the Roku store.",
+			Name:    "build",
+			Aliases: []string{"b"},
+			Flags: []cli.Flag{
+				sourceFlag,
+				destinationFlag,
+				zipFlag,
+			},
+			Usage:  "Build a .zip of the app for submission to the Roku store.",
+			Action: Build,
 		},
 	}
 
