@@ -115,7 +115,21 @@ func UpdateDevice(c *cli.Context) error {
 		return cli.NewExitError("invalid device number to update", 1)
 	}
 
-	rc.Devices[fs.Choice] = &Device{IP: fs.IP, Name: fs.Name, Username: fs.Username, Password: fs.Password, Current: fs.Current}
+	device := rc.Devices[fs.Choice]
+	if fs.Name != "" {
+		device.Name = fs.Name
+	}
+	if fs.IP != "" {
+		device.IP = fs.IP
+	}
+	if fs.Username != "" {
+		device.Username = fs.Username
+	}
+	if fs.Password != "" {
+		device.Password = fs.Password
+	}
+	device.Current = fs.Current
+
 	rc.Write()
 
 	ListDevices(c)
