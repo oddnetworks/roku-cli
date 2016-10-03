@@ -13,10 +13,6 @@
 			"path": "gopkg.in/urfave/cli.v1",
 			"revision": "a14d7d367bc02b1f57d88de97926727f2d936387",
 			"revisionTime": "2016-08-29T00:43:50Z"
-		},
-		{
-			"path": "mitchellh/go-homedir",
-			"revision": ""
 		}
 	],
 	"rootPath": "github.com/oddnetworks/roku-cli"

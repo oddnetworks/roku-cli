@@ -2,9 +2,10 @@ package main
 
 import (
 	"encoding/json"
-	"go-homedir"
 	"io/ioutil"
 	"os"
+
+	"github.com/mitchellh/go-homedir"
 )
 
 type Device struct {
