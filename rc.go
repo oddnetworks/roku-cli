@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"github.com/mitchellh/go-homedir"
+	"go-homedir"
 	"io/ioutil"
 	"os"
 )
@@ -20,32 +20,51 @@ type RC struct {
 	path    string
 }
 
-func NewRC() *RC {
-	homeDir, _ := homedir.Dir()
-	path, _ := homedir.Expand(homeDir)
+func NewRC() (*RC, error) {
+	homeDir, err := homedir.Dir()
+	if err != nil {
+		return nil, err
+	}
+	path, err := homedir.Expand(homeDir)
+	if err != nil {
+		return nil, err
+	}
 	path += "/.rokuclirc"
 
 	rc := &RC{
 		path: path,
 	}
 
-	if _, err := os.Stat(rc.path); os.IsNotExist(err) {
-		rc.Write()
+	if _, err = os.Stat(rc.path); os.IsNotExist(err) {
+		err = rc.Write()
 	} else {
-		rc.Read()
+		err = rc.Read()
 	}
 
-	return rc
+	if err != nil {
+		return nil, err
+	}
+
+	return rc, nil
 }
 
-func (rc *RC) Write() {
-	data, _ := json.Marshal(rc)
-	ioutil.WriteFile(rc.path, data, os.ModePerm)
+func (rc *RC) Write() error {
+	data, err := json.Marshal(rc)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(rc.path, data, os.ModePerm)
+	return err
 }
 
-func (rc *RC) Read() {
-	data, _ := ioutil.ReadFile(rc.path)
-	json.Unmarshal(data, rc)
+func (rc *RC) Read() error {
+	data, err := ioutil.ReadFile(rc.path)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(data, rc)
+	return err
 }
 
 func (rc *RC) CurrentDevice() *Device {

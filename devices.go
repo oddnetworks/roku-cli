@@ -2,12 +2,13 @@ package main
 
 import (
 	"fmt"
-	"gopkg.in/urfave/cli.v1"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"gopkg.in/urfave/cli.v1"
 )
 
 func FindDevices(c *cli.Context) error {
@@ -46,8 +47,14 @@ func FindDevices(c *cli.Context) error {
 }
 
 func SwitchDevice(c *cli.Context) error {
-	rc := NewRC()
-	choice, _ := strconv.Atoi(c.Args().First())
+	rc, err := NewRC()
+	if err != nil {
+		return cli.NewExitError("new rc failed: "+err.Error(), 1)
+	}
+	choice, err := strconv.Atoi(c.Args().First())
+	if err != nil {
+		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
+	}
 
 	for index, device := range rc.Devices {
 		device.Current = false
@@ -63,7 +70,10 @@ func SwitchDevice(c *cli.Context) error {
 }
 
 func ListDevices(c *cli.Context) error {
-	rc := NewRC()
+	rc, err := NewRC()
+	if err != nil {
+		return cli.NewExitError("new rc failed: "+err.Error(), 1)
+	}
 	if len(rc.Devices) > 0 {
 		for index, device := range rc.Devices {
 			currentDevice := ""
@@ -81,8 +91,14 @@ func ListDevices(c *cli.Context) error {
 }
 
 func CreateDevice(c *cli.Context) error {
-	rc := NewRC()
-	currentArg, _ := strconv.ParseBool(c.Args().Get(4))
+	rc, err := NewRC()
+	if err != nil {
+		return cli.NewExitError("new rc failed: "+err.Error(), 1)
+	}
+	currentArg, err := strconv.ParseBool(c.Args().Get(4))
+	if err != nil {
+		return cli.NewExitError("parsing fourth arg failed: "+err.Error(), 1)
+	}
 
 	device := &Device{Name: c.Args().Get(0), IP: c.Args().Get(1), Username: c.Args().Get(2), Password: c.Args().Get(3), Current: currentArg}
 	rc.Devices = append(rc.Devices, device)
@@ -94,14 +110,28 @@ func CreateDevice(c *cli.Context) error {
 }
 
 func UpdateDevice(c *cli.Context) error {
-	rc := NewRC()
-	choice, _ := strconv.Atoi(c.Args().First())
-	currentArg, _ := strconv.ParseBool(c.Args().Get(4))
+	rc, err := NewRC()
+	if err != nil {
+		return cli.NewExitError("new rc failed: "+err.Error(), 1)
+	}
+	choice, err := strconv.Atoi(c.Args().First())
+	if err != nil {
+		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
+	}
+
+	currentArg, err := strconv.ParseBool(c.Args().Get(4))
+	if err != nil {
+		return cli.NewExitError("parsing fourth arg failed: "+err.Error(), 1)
+	}
 
 	if currentArg {
 		for _, device := range rc.Devices {
 			device.Current = false
 		}
+	}
+
+	if choice+1 > len(rc.Devices) {
+		return cli.NewExitError("invalid device number to update", 1)
 	}
 
 	rc.Devices[choice] = &Device{IP: c.Args().Get(1), Username: c.Args().Get(2), Password: c.Args().Get(3), Current: currentArg}
@@ -113,11 +143,21 @@ func UpdateDevice(c *cli.Context) error {
 }
 
 func DeleteDevice(c *cli.Context) error {
-	rc := NewRC()
-	choice, _ := strconv.Atoi(c.Args().First())
+	rc, err := NewRC()
+	if err != nil {
+		return cli.NewExitError("new rc failed: "+err.Error(), 1)
+	}
+	choice, err := strconv.Atoi(c.Args().First())
+	if err != nil {
+		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
+	}
+
+	if choice+1 > len(rc.Devices) {
+		return cli.NewExitError("invalid device number to delete", 1)
+	}
 
 	rc.Devices = append(rc.Devices[:choice], rc.Devices[choice+1:]...)
-	if rc.CurrentDevice() == nil {
+	if rc.CurrentDevice() == nil && len(rc.Devices) > 0 {
 		rc.Devices[0].Current = true
 	}
 	rc.Write()
