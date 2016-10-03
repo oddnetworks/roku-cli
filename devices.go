@@ -90,6 +90,20 @@ func CreateDevice(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
+
+	if fs.Name == "" {
+		return cli.NewExitError("Missing --name flag.", 1)
+	}
+	if fs.IP == "" {
+		return cli.NewExitError("Missing --ip flag.", 1)
+	}
+	if fs.Username == "" {
+		return cli.NewExitError("Missing --username flag.", 1)
+	}
+	if fs.Password == "" {
+		return cli.NewExitError("Missing --password flag.", 1)
+	}
+
 	device := &Device{Name: fs.Name, IP: fs.IP, Username: fs.Username, Password: fs.Password, Current: fs.Current}
 	rc.Devices = append(rc.Devices, device)
 	rc.Write()
