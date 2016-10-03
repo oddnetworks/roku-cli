@@ -50,17 +50,17 @@ $ roku-cli devices list
 Switch Roku devices to set a current one for interacting with.
 
 ```
-$ roku-cli devices switch 0
+$ roku-cli devices switch -choice=0
 0) stick 192.168.0.13 (rokudev/testing12345) current
 1) roku-3 192.168.0.100 (admin/demo)
 ```
 
 #### Subcommand: `create|c`
 
-Create a new Roku device in your `$HOME/.rokuclirc` file.
+Create a new Roku device in your `$HOME/.rokuclirc` file. All flags are required to create a device.
 
 ```
-$ roku-cli devices create roku-2 10.0.0.12 rokudev roku4life true
+$ roku-cli devices create --name="roku-2" --ip="10.0.0.12" --username=rokudev --password=roku4life --default=true
 0) stick 192.168.0.13 (rokudev/testing12345)
 1) roku-3 192.168.0.100 (admin/demo)
 2) roku-2 10.0.0.12 (rokudev/roku4life) current
@@ -68,13 +68,13 @@ $ roku-cli devices create roku-2 10.0.0.12 rokudev roku4life true
 
 #### Subcommand: `update|u`
 
-Update a Roku device in your `$HOME/.rokuclirc` file.
+Update a Roku device in your `$HOME/.rokuclirc` file. Only flag values that are passed in will be updated. Others will be left alone.
 
 ```
-$ roku-cli devices update 1 roku-3 10.0.0.100 rokudev roku4life true
+$ roku-cli devices update --choice=1 --name="roku-3" --ip="10.0.0.100"
 0) stick 192.168.0.13 (rokudev/testing12345)
-1) roku-3 10.0.0.100 (rokudev/roku4life) current
-2) roku-2 10.0.0.12 (rokudev/roku4life)
+1) roku-3 10.0.0.100 (admin/demo)
+2) roku-2 10.0.0.12 (rokudev/roku4life) current
 ```
 
 #### Subcommand: `delete|d|del`
@@ -82,10 +82,19 @@ $ roku-cli devices update 1 roku-3 10.0.0.100 rokudev roku4life true
 Delete a Roku device in your `$HOME/.rokuclirc` file.
 
 ```
-$ roku-cli devices delete 1
+$ roku-cli devices delete --choice=0
 0) stick 192.168.0.13 (rokudev/testing12345) current
 1) roku-2 10.0.0.12 (rokudev/roku4life)
 ```
+
+**Note:** Flags also have shorthand versions too.
+
+- --choice (-c)
+- --name (-n)
+- --ip (-i)
+- --username (-u)
+- --password (-p)
+- --default (-d)
 
 ### Command: `build` (TODO)
 
