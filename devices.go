@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"strconv"
 	"strings"
 	"time"
 
@@ -51,14 +50,10 @@ func SwitchDevice(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
-	choice, err := strconv.Atoi(c.Args().First())
-	if err != nil {
-		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
-	}
 
 	for index, device := range rc.Devices {
 		device.Current = false
-		if index == choice {
+		if index == fs.Choice {
 			device.Current = true
 		}
 	}
@@ -95,12 +90,7 @@ func CreateDevice(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
-	currentArg, err := strconv.ParseBool(c.Args().Get(4))
-	if err != nil {
-		return cli.NewExitError("parsing fourth arg failed: "+err.Error(), 1)
-	}
-
-	device := &Device{Name: c.Args().Get(0), IP: c.Args().Get(1), Username: c.Args().Get(2), Password: c.Args().Get(3), Current: currentArg}
+	device := &Device{Name: fs.Name, IP: fs.IP, Username: fs.Username, Password: fs.Password, Current: fs.Current}
 	rc.Devices = append(rc.Devices, device)
 	rc.Write()
 
@@ -114,27 +104,18 @@ func UpdateDevice(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
-	choice, err := strconv.Atoi(c.Args().First())
-	if err != nil {
-		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
-	}
 
-	currentArg, err := strconv.ParseBool(c.Args().Get(4))
-	if err != nil {
-		return cli.NewExitError("parsing fourth arg failed: "+err.Error(), 1)
-	}
-
-	if currentArg {
+	if fs.Current {
 		for _, device := range rc.Devices {
 			device.Current = false
 		}
 	}
 
-	if choice+1 > len(rc.Devices) {
+	if fs.Choice+1 > len(rc.Devices) {
 		return cli.NewExitError("invalid device number to update", 1)
 	}
 
-	rc.Devices[choice] = &Device{IP: c.Args().Get(1), Username: c.Args().Get(2), Password: c.Args().Get(3), Current: currentArg}
+	rc.Devices[fs.Choice] = &Device{IP: fs.IP, Name: fs.Name, Username: fs.Username, Password: fs.Password, Current: fs.Current}
 	rc.Write()
 
 	ListDevices(c)
@@ -147,16 +128,12 @@ func DeleteDevice(c *cli.Context) error {
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
-	choice, err := strconv.Atoi(c.Args().First())
-	if err != nil {
-		return cli.NewExitError("parsing first arg failed: "+err.Error(), 1)
-	}
 
-	if choice+1 > len(rc.Devices) {
+	if fs.Choice+1 > len(rc.Devices) {
 		return cli.NewExitError("invalid device number to delete", 1)
 	}
 
-	rc.Devices = append(rc.Devices[:choice], rc.Devices[choice+1:]...)
+	rc.Devices = append(rc.Devices[:fs.Choice], rc.Devices[fs.Choice+1:]...)
 	if rc.CurrentDevice() == nil && len(rc.Devices) > 0 {
 		rc.Devices[0].Current = true
 	}
