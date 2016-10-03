@@ -14,37 +14,37 @@ type flagset struct {
 var fs flagset
 
 var choiceFlag = cli.IntFlag{
-	Name:        "choice",
-	Usage:       "choice of roku device from list",
+	Name:        "choice, c",
+	Usage:       "Choice of Roku device from list",
 	Destination: &fs.Choice,
 }
 
 var nameFlag = cli.StringFlag{
-	Name:        "name",
-	Usage:       "name of roku device",
+	Name:        "name, n",
+	Usage:       "Name of your Roku device for reference",
 	Destination: &fs.Name,
 }
 
 var usernameFlag = cli.StringFlag{
-	Name:        "username",
-	Usage:       "username of roku device",
+	Name:        "username, u",
+	Usage:       "Username used to login to with Basic Auth",
 	Destination: &fs.Username,
 }
 
 var passwordFlag = cli.StringFlag{
-	Name:        "password",
-	Usage:       "password for roku device",
+	Name:        "password, p",
+	Usage:       "Psername used to login to with Basic Auth",
 	Destination: &fs.Password,
 }
 
 var ipFlag = cli.StringFlag{
-	Name:        "ip",
-	Usage:       "ip address of roku device",
+	Name:        "ip, i",
+	Usage:       "IP address of your Roku device on your local network",
 	Destination: &fs.IP,
 }
 
 var defaultFlag = cli.BoolFlag{
-	Name:        "default",
-	Usage:       "is default roku device to use",
+	Name:        "default, d",
+	Usage:       "Set this as the default Roku device to use",
 	Destination: &fs.Current,
 }
