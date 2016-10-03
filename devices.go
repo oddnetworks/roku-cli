@@ -59,8 +59,6 @@ func SwitchDevice(c *cli.Context) error {
 	}
 	rc.Write()
 
-	ListDevices(c)
-
 	return nil
 }
 
@@ -108,8 +106,6 @@ func CreateDevice(c *cli.Context) error {
 	rc.Devices = append(rc.Devices, device)
 	rc.Write()
 
-	ListDevices(c)
-
 	return nil
 }
 
@@ -146,8 +142,6 @@ func UpdateDevice(c *cli.Context) error {
 
 	rc.Write()
 
-	ListDevices(c)
-
 	return nil
 }
 
@@ -166,8 +160,6 @@ func DeleteDevice(c *cli.Context) error {
 		rc.Devices[0].Current = true
 	}
 	rc.Write()
-
-	ListDevices(c)
 
 	return nil
 }
