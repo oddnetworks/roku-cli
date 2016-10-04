@@ -14,41 +14,42 @@ import (
 var requiredPaths []string = []string{"manifest", "source"}
 var allowedPaths []string = []string{"manifest", "source", "images", "components"}
 
-func Build(c *cli.Context) error {
-	source := fs.Source
-	if source == "" {
-		source = "./"
+func EnsurePaths(c *cli.Context) error {
+	if fs.Source == "" {
+		fs.Source = "./"
 	}
 
 	// Verify source folder contains required Roku files and folders
 	for _, required := range requiredPaths {
-		verifyPath := filepath.Join(source, required)
+		verifyPath := filepath.Join(fs.Source, required)
 		if _, err := os.Stat(verifyPath); os.IsNotExist(err) {
 			return cli.NewExitError("Not a valid Roku project. Missing: "+verifyPath, 1)
 		}
 	}
 
-	fmt.Println("Building from path:", source)
+	fmt.Println("Building from path:", fs.Source)
 
-	destination := fs.Destination
-	if destination == "" {
-		destination = filepath.Join(source, "build")
+	if fs.Destination == "" {
+		fs.Destination = filepath.Join(fs.Source, "build")
 	}
 
 	// Make the destination folder if it doesn't exist
-	if _, err := os.Stat(destination); os.IsNotExist(err) {
-		err = os.Mkdir(destination, os.ModePerm)
+	if _, err := os.Stat(fs.Destination); os.IsNotExist(err) {
+		err = os.Mkdir(fs.Destination, os.ModePerm)
 	}
 
-	zipName := fs.Zip
-	if zipName == "" {
-		zipName = filepath.Join(destination, "channel.zip")
+	if fs.Zip == "" {
+		fs.Zip = filepath.Join(fs.Destination, "channel.zip")
 	} else {
-		zipName = filepath.Join(destination, zipName)
+		fs.Zip = filepath.Join(fs.Destination, fs.Zip)
 	}
 
+	return nil
+}
+
+func Build(c *cli.Context) error {
 	// Make a new file handler and zip archive
-	zipFile, err := os.Create(zipName)
+	zipFile, err := os.Create(fs.Zip)
 	if err != nil {
 		return cli.NewExitError("Zip file could not be created: "+err.Error(), 1)
 	}
@@ -58,8 +59,7 @@ func Build(c *cli.Context) error {
 	defer archive.Close()
 
 	// Walk the source path and add each path to the archive
-	baseDir := filepath.Base(source)
-	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(fs.Source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -106,11 +106,7 @@ func Build(c *cli.Context) error {
 		return cli.NewExitError("Error zipping: "+err.Error(), 1)
 	}
 
-	fmt.Println("Build complete:", zipName)
+	fmt.Println("Build complete:", fs.Zip)
 
-	return nil
-}
-
-func Install(c *cli.Context) error {
 	return nil
 }
