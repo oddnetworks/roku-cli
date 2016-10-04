@@ -13,7 +13,9 @@ A cross platform Roku CLI written in Go.
 ## Installing
 
 1. Install Go
-2. `go install github.com/oddnetworks/roku-cli`
+2. Use your prefered dependency management tool to install the required modules from the vendor folder
+ [Govendor](https://github.com/kardianos/govendor) works well for this purpose
+3. `go install github.com/oddnetworks/roku-cli`
 
 ## Usage
 
