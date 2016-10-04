@@ -28,7 +28,7 @@ func Build(c *cli.Context) error {
 		}
 	}
 
-	fmt.Println("Creating zip from: ", source)
+	fmt.Println("Building from path:", source)
 
 	destination := fs.Destination
 	if destination == "" {
@@ -107,7 +107,7 @@ func Build(c *cli.Context) error {
 		return cli.NewExitError("Error zipping: "+err.Error(), 1)
 	}
 
-	fmt.Println("Zip created: ", zipName)
+	fmt.Println("Build complete:", zipName)
 
 	return nil
 }
