@@ -21,14 +21,15 @@ func Build(c *cli.Context) error {
 	}
 
 	for _, required := range requiredPaths {
-		if _, err := os.Stat(source + required); os.IsNotExist(err) {
-			return cli.NewExitError("Not a valid Roku project. Missing: "+source+required, 1)
+		verifyPath := filepath.Join(source, required)
+		if _, err := os.Stat(verifyPath); os.IsNotExist(err) {
+			return cli.NewExitError("Not a valid Roku project. Missing: "+verifyPath, 1)
 		}
 	}
 
 	destination := fs.Destination
 	if destination == "" {
-		destination = source + "build/"
+		destination = filepath.Join(source, "build")
 	}
 	if _, err := os.Stat(destination); os.IsNotExist(err) {
 		err = os.Mkdir(destination, os.ModePerm)
@@ -36,9 +37,9 @@ func Build(c *cli.Context) error {
 
 	zipName := fs.Zip
 	if zipName == "" {
-		zipName = destination + "channel.zip"
+		zipName = filepath.Join(destination, "channel.zip")
 	} else {
-		zipName = destination + zipName
+		zipName = filepath.Join(destination, zipName)
 	}
 
 	zipFile, err := os.Create(zipName)
