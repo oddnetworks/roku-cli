@@ -26,7 +26,7 @@ func FindDevices(c *cli.Context) error {
 			remoteip := net.IPv4(localip[0], localip[1], localip[2], byte(node))
 
 			timeout := time.Duration(1 * time.Second)
-			client := http.Client{Timeout: timeout}
+			client := &http.Client{Timeout: timeout}
 			res, err := client.Get("http://" + remoteip.String())
 			if err == nil && strings.Contains(res.Header.Get("Www-Authenticate"), "rokudev") {
 				results <- remoteip.String()
