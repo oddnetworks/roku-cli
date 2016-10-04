@@ -71,10 +71,9 @@ func Build(c *cli.Context) error {
 					return err
 				}
 
-				if baseDir != "" {
-					header.Name = filepath.Join(baseDir, strings.TrimPrefix(path, source))
-				}
+				header.Name = strings.TrimPrefix(path, fs.Source+"/")
 
+				header.Method = zip.Store
 				if info.IsDir() {
 					header.Name += "/"
 				} else {
