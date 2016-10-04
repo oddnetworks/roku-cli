@@ -96,18 +96,18 @@ $ roku-cli devices delete --choice=0
 - --password (-p)
 - --default (-d)
 
-### Command: `build` (TODO)
+### Command: `build`
 
 This will build a ZIP file to be installed or submitted to Roku for distribution.
 
 ```
 $ roku-cli build
 Building from path: ./src
-Build complete: ./build/package.zip
+Build complete: ./build/channel.zip
 
-$ roku-cli build ~/some/other/path /var/tmp
-Building from path: ~/some/other/path
-Build complete: /var/tmp/package.zip
+$ roku-cli build --source=/some/other/path --destination=/var/tmp --zip=package-v1234.zip
+Building from path: /some/other/path
+Build complete: /var/tmp/package-v1234.zip
 ```
 
 ### Command: `install` (TODO)
