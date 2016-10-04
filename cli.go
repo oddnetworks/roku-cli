@@ -51,22 +51,20 @@ func main() {
 			},
 		},
 		{
-			Name:  "install",
-			Usage: "Install an app onto the Roku.",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Name:    "install",
+			Aliases: []string{"i"},
+			Flags:   []cli.Flag{sourceFlag, destinationFlag, zipFlag},
+			Usage:   "Install an app onto the Roku.",
+			Before:  EnsurePaths,
+			Action:  Install,
 		},
 		{
 			Name:    "build",
 			Aliases: []string{"b"},
-			Flags: []cli.Flag{
-				sourceFlag,
-				destinationFlag,
-				zipFlag,
-			},
-			Usage:  "Build a .zip of the app for submission to the Roku store.",
-			Action: Build,
+			Flags:   []cli.Flag{sourceFlag, destinationFlag, zipFlag},
+			Usage:   "Build a .zip of the app for submission to the Roku store.",
+			Before:  EnsurePaths,
+			Action:  Build,
 		},
 	}
 
