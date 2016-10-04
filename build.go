@@ -52,7 +52,7 @@ func Build(c *cli.Context) error {
 	defer archive.Close()
 
 	baseDir := filepath.Base(source)
-	filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -96,6 +96,9 @@ func Build(c *cli.Context) error {
 
 		return err
 	})
+	if err != nil {
+		return cli.NewExitError("Error zipping: "+err.Error(), 1)
+	}
 
 	fmt.Println("Zip created: ", zipName)
 
