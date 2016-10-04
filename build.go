@@ -20,6 +20,7 @@ func Build(c *cli.Context) error {
 		source = "./"
 	}
 
+	// Verify source folder contains required Roku files and folders
 	for _, required := range requiredPaths {
 		verifyPath := filepath.Join(source, required)
 		if _, err := os.Stat(verifyPath); os.IsNotExist(err) {
@@ -27,10 +28,14 @@ func Build(c *cli.Context) error {
 		}
 	}
 
+	fmt.Println("Creating zip from: ", source)
+
 	destination := fs.Destination
 	if destination == "" {
 		destination = filepath.Join(source, "build")
 	}
+
+	// Make the destination folder if it doesn't exist
 	if _, err := os.Stat(destination); os.IsNotExist(err) {
 		err = os.Mkdir(destination, os.ModePerm)
 	}
@@ -42,6 +47,7 @@ func Build(c *cli.Context) error {
 		zipName = filepath.Join(destination, zipName)
 	}
 
+	// Make a new file handler and zip archive
 	zipFile, err := os.Create(zipName)
 	if err != nil {
 		return cli.NewExitError("Zip file could not be created: "+err.Error(), 1)
@@ -51,6 +57,7 @@ func Build(c *cli.Context) error {
 	archive := zip.NewWriter(zipFile)
 	defer archive.Close()
 
+	// Walk the source path and add each path to the archive
 	baseDir := filepath.Base(source)
 	err = filepath.Walk(source, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
