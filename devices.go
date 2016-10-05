@@ -26,7 +26,7 @@ func FindDevices(c *cli.Context) error {
 			remoteip := net.IPv4(localip[0], localip[1], localip[2], byte(node))
 
 			timeout := time.Duration(1 * time.Second)
-			client := http.Client{Timeout: timeout}
+			client := &http.Client{Timeout: timeout}
 			res, err := client.Get("http://" + remoteip.String())
 			if err == nil && strings.Contains(res.Header.Get("Www-Authenticate"), "rokudev") {
 				results <- remoteip.String()
@@ -58,8 +58,6 @@ func SwitchDevice(c *cli.Context) error {
 		}
 	}
 	rc.Write()
-
-	ListDevices(c)
 
 	return nil
 }
@@ -108,8 +106,6 @@ func CreateDevice(c *cli.Context) error {
 	rc.Devices = append(rc.Devices, device)
 	rc.Write()
 
-	ListDevices(c)
-
 	return nil
 }
 
@@ -146,8 +142,6 @@ func UpdateDevice(c *cli.Context) error {
 
 	rc.Write()
 
-	ListDevices(c)
-
 	return nil
 }
 
@@ -166,8 +160,6 @@ func DeleteDevice(c *cli.Context) error {
 		rc.Devices[0].Current = true
 	}
 	rc.Write()
-
-	ListDevices(c)
 
 	return nil
 }

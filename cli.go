@@ -18,13 +18,13 @@ func main() {
 			Usage:   "Manage devices",
 			Subcommands: []cli.Command{
 				{Name: "find", Aliases: []string{"f"}, Action: FindDevices},
-				{Name: "switch", Aliases: []string{"s"}, Action: SwitchDevice,
+				{Name: "switch", Aliases: []string{"s"}, Action: SwitchDevice, After: ListDevices,
 					Flags: []cli.Flag{
 						choiceFlag,
 					},
 				},
 				{Name: "list", Aliases: []string{"l", "ls"}, Action: ListDevices},
-				{Name: "create", Aliases: []string{"c"}, Action: CreateDevice,
+				{Name: "create", Aliases: []string{"c"}, Action: CreateDevice, After: ListDevices,
 					Flags: []cli.Flag{
 						nameFlag,
 						ipFlag,
@@ -33,7 +33,7 @@ func main() {
 						defaultFlag,
 					},
 				},
-				{Name: "update", Aliases: []string{"u"}, Action: UpdateDevice,
+				{Name: "update", Aliases: []string{"u"}, Action: UpdateDevice, After: ListDevices,
 					Flags: []cli.Flag{
 						choiceFlag,
 						nameFlag,
@@ -43,7 +43,7 @@ func main() {
 						defaultFlag,
 					},
 				},
-				{Name: "delete", Aliases: []string{"d", "del", "rm"}, Action: DeleteDevice,
+				{Name: "delete", Aliases: []string{"d", "del", "rm"}, Action: DeleteDevice, After: ListDevices,
 					Flags: []cli.Flag{
 						choiceFlag,
 					},
@@ -51,15 +51,20 @@ func main() {
 			},
 		},
 		{
-			Name:  "install",
-			Usage: "Install an app onto the Roku.",
-			Action: func(c *cli.Context) error {
-				return nil
-			},
+			Name:    "install",
+			Aliases: []string{"i"},
+			Flags:   []cli.Flag{sourceFlag, destinationFlag, zipFlag},
+			Usage:   "Install an app onto the Roku.",
+			Before:  EnsurePaths,
+			Action:  Install,
 		},
 		{
-			Name:  "build",
-			Usage: "Build a .zip of the app for submission to the Roku store.",
+			Name:    "build",
+			Aliases: []string{"b"},
+			Flags:   []cli.Flag{sourceFlag, destinationFlag, zipFlag},
+			Usage:   "Build a .zip of the app for submission to the Roku store.",
+			Before:  EnsurePaths,
+			Action:  Build,
 		},
 	}
 

@@ -3,12 +3,15 @@ package main
 import cli "gopkg.in/urfave/cli.v1"
 
 type flagset struct {
-	Choice   int
-	Name     string
-	Username string
-	Password string
-	IP       string
-	Current  bool
+	Choice      int
+	Name        string
+	Username    string
+	Password    string
+	IP          string
+	Current     bool
+	Source      string
+	Destination string
+	Zip         string
 }
 
 var fs flagset
@@ -47,4 +50,22 @@ var defaultFlag = cli.BoolFlag{
 	Name:        "default, d",
 	Usage:       "Set this as the default Roku device to use",
 	Destination: &fs.Current,
+}
+
+var sourceFlag = cli.StringFlag{
+	Name:        "source, src, s",
+	Usage:       "Source folder path of your Roku channel, defaults to ./",
+	Destination: &fs.Source,
+}
+
+var destinationFlag = cli.StringFlag{
+	Name:        "destination, dst, d",
+	Usage:       "Destination folder path of your Roku channel, defaults to ./build",
+	Destination: &fs.Destination,
+}
+
+var zipFlag = cli.StringFlag{
+	Name:        "zip, z",
+	Usage:       "ZIP file name of your Roku channel, defaults to channel.zip",
+	Destination: &fs.Zip,
 }
