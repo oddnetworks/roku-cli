@@ -6,8 +6,8 @@ A cross platform Roku CLI written in Go.
 
 - Manages multiple Roku devices during development
 - Debug Roku output from Telnet ports (TODO)
-- Builds and installs apps onto Roku hardware (TODO)
-- Builds apps for submission to the Roku Channel Store (TODO)
+- Builds and installs apps onto Roku hardware
+- Builds apps for submission to the Roku Channel Store
 - Scans local network to find all available Roku devices
 
 ## Installing
@@ -112,7 +112,7 @@ Building from path: /some/other/path
 Build complete: /var/tmp/package-v1234.zip
 ```
 
-### Command: `install` (TODO)
+### Command: `install`
 
 This will build a ZIP file and install it to the currently active Roku device.
 
@@ -120,12 +120,14 @@ This will build a ZIP file and install it to the currently active Roku device.
 $ roku-cli install
 Building from path: ./src
 Build complete: ./build/package.zip
-Installing to: roku-2 10.0.0.12
+Install complete: roku-2 10.0.0.12
+Roku response: "Application Received: 131313131 bytes saves"
 
 $ roku-cli install ~/some/other/path /var/tmp
 Building from path: ~/some/other/path
 Build complete: /var/tmp/package.zip
-Installing to: roku-2 10.0.0.12
+Install complete: roku-2 10.0.0.12
+Roku response: "Application Received: Identical to previous version -- not replacing"
 ```
 
 ### Command: `debug` (TODO)
