@@ -1,4 +1,4 @@
-package main
+package rc
 
 import (
 	"encoding/json"
@@ -21,7 +21,7 @@ type RC struct {
 	path    string
 }
 
-func NewRC() (*RC, error) {
+func LoadRC() (*RC, error) {
 	homeDir, err := homedir.Dir()
 	if err != nil {
 		return nil, err

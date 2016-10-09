@@ -1,8 +1,10 @@
-package main
+package commands
 
-import cli "gopkg.in/urfave/cli.v1"
+import (
+	"gopkg.in/urfave/cli.v1"
+)
 
-type flagset struct {
+type FlagSet struct {
 	Choice      int
 	Name        string
 	Username    string
@@ -14,58 +16,58 @@ type flagset struct {
 	Zip         string
 }
 
-var fs flagset
+var FS FlagSet
 
-var choiceFlag = cli.IntFlag{
+var ChoiceFlag = cli.IntFlag{
 	Name:        "choice, c",
 	Usage:       "Choice of Roku device from list",
-	Destination: &fs.Choice,
+	Destination: &FS.Choice,
 }
 
-var nameFlag = cli.StringFlag{
+var NameFlag = cli.StringFlag{
 	Name:        "name, n",
 	Usage:       "Name of your Roku device for reference",
-	Destination: &fs.Name,
+	Destination: &FS.Name,
 }
 
-var usernameFlag = cli.StringFlag{
+var UsernameFlag = cli.StringFlag{
 	Name:        "username, u",
 	Usage:       "Username used to login to with Basic Auth",
-	Destination: &fs.Username,
+	Destination: &FS.Username,
 }
 
-var passwordFlag = cli.StringFlag{
+var PasswordFlag = cli.StringFlag{
 	Name:        "password, p",
 	Usage:       "Psername used to login to with Basic Auth",
-	Destination: &fs.Password,
+	Destination: &FS.Password,
 }
 
-var ipFlag = cli.StringFlag{
+var IPFlag = cli.StringFlag{
 	Name:        "ip, i",
 	Usage:       "IP address of your Roku device on your local network",
-	Destination: &fs.IP,
+	Destination: &FS.IP,
 }
 
-var defaultFlag = cli.BoolFlag{
+var DefaultFlag = cli.BoolFlag{
 	Name:        "default, d",
 	Usage:       "Set this as the default Roku device to use",
-	Destination: &fs.Current,
+	Destination: &FS.Current,
 }
 
-var sourceFlag = cli.StringFlag{
+var SourceFlag = cli.StringFlag{
 	Name:        "source, src, s",
 	Usage:       "Source folder path of your Roku channel, defaults to ./",
-	Destination: &fs.Source,
+	Destination: &FS.Source,
 }
 
-var destinationFlag = cli.StringFlag{
+var DestinationFlag = cli.StringFlag{
 	Name:        "destination, dst, d",
 	Usage:       "Destination folder path of your Roku channel, defaults to ./build",
-	Destination: &fs.Destination,
+	Destination: &FS.Destination,
 }
 
-var zipFlag = cli.StringFlag{
+var ZipFlag = cli.StringFlag{
 	Name:        "zip, z",
 	Usage:       "ZIP file name of your Roku channel, defaults to channel.zip",
-	Destination: &fs.Zip,
+	Destination: &FS.Zip,
 }
