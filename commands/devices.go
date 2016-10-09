@@ -1,4 +1,4 @@
-package main
+package commands
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 	"time"
 
 	"gopkg.in/urfave/cli.v1"
+
+	"github.com/oddnetworks/roku-cli/rc"
 )
 
 func FindDevices(c *cli.Context) error {
@@ -46,29 +48,29 @@ func FindDevices(c *cli.Context) error {
 }
 
 func SwitchDevice(c *cli.Context) error {
-	rc, err := NewRC()
+	config, err := rc.LoadRC()
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
 
-	for index, device := range rc.Devices {
+	for index, device := range config.Devices {
 		device.Current = false
-		if index == fs.Choice {
+		if index == FS.Choice {
 			device.Current = true
 		}
 	}
-	rc.Write()
+	config.Write()
 
 	return nil
 }
 
 func ListDevices(c *cli.Context) error {
-	rc, err := NewRC()
+	config, err := rc.LoadRC()
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
-	if len(rc.Devices) > 0 {
-		for index, device := range rc.Devices {
+	if len(config.Devices) > 0 {
+		for index, device := range config.Devices {
 			currentDevice := ""
 			if device.Current {
 				currentDevice = "current"
@@ -84,82 +86,82 @@ func ListDevices(c *cli.Context) error {
 }
 
 func CreateDevice(c *cli.Context) error {
-	rc, err := NewRC()
+	config, err := rc.LoadRC()
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
 
-	if fs.Name == "" {
+	if FS.Name == "" {
 		return cli.NewExitError("Missing --name flag.", 1)
 	}
-	if fs.IP == "" {
+	if FS.IP == "" {
 		return cli.NewExitError("Missing --ip flag.", 1)
 	}
-	if fs.Username == "" {
+	if FS.Username == "" {
 		return cli.NewExitError("Missing --username flag.", 1)
 	}
-	if fs.Password == "" {
+	if FS.Password == "" {
 		return cli.NewExitError("Missing --password flag.", 1)
 	}
 
-	device := &Device{Name: fs.Name, IP: fs.IP, Username: fs.Username, Password: fs.Password, Current: fs.Current}
-	rc.Devices = append(rc.Devices, device)
-	rc.Write()
+	device := &rc.Device{Name: FS.Name, IP: FS.IP, Username: FS.Username, Password: FS.Password, Current: FS.Current}
+	config.Devices = append(config.Devices, device)
+	config.Write()
 
 	return nil
 }
 
 func UpdateDevice(c *cli.Context) error {
-	rc, err := NewRC()
+	config, err := rc.LoadRC()
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
 
-	if fs.Current {
-		for _, device := range rc.Devices {
+	if FS.Current {
+		for _, device := range config.Devices {
 			device.Current = false
 		}
 	}
 
-	if fs.Choice+1 > len(rc.Devices) {
+	if FS.Choice+1 > len(config.Devices) {
 		return cli.NewExitError("invalid device number to update", 1)
 	}
 
-	device := rc.Devices[fs.Choice]
-	if fs.Name != "" {
-		device.Name = fs.Name
+	device := config.Devices[FS.Choice]
+	if FS.Name != "" {
+		device.Name = FS.Name
 	}
-	if fs.IP != "" {
-		device.IP = fs.IP
+	if FS.IP != "" {
+		device.IP = FS.IP
 	}
-	if fs.Username != "" {
-		device.Username = fs.Username
+	if FS.Username != "" {
+		device.Username = FS.Username
 	}
-	if fs.Password != "" {
-		device.Password = fs.Password
+	if FS.Password != "" {
+		device.Password = FS.Password
 	}
-	device.Current = fs.Current
+	device.Current = FS.Current
 
-	rc.Write()
+	config.Write()
 
 	return nil
 }
 
 func DeleteDevice(c *cli.Context) error {
-	rc, err := NewRC()
+	config, err := rc.LoadRC()
 	if err != nil {
 		return cli.NewExitError("new rc failed: "+err.Error(), 1)
 	}
 
-	if fs.Choice+1 > len(rc.Devices) {
+	if FS.Choice+1 > len(config.Devices) {
 		return cli.NewExitError("invalid device number to delete", 1)
 	}
 
-	rc.Devices = append(rc.Devices[:fs.Choice], rc.Devices[fs.Choice+1:]...)
-	if rc.CurrentDevice() == nil && len(rc.Devices) > 0 {
-		rc.Devices[0].Current = true
+	config.Devices = append(config.Devices[:FS.Choice], config.Devices[FS.Choice+1:]...)
+	if config.CurrentDevice() == nil && len(config.Devices) > 0 {
+		config.Devices[0].Current = true
 	}
-	rc.Write()
+	config.Write()
 
 	return nil
 }
