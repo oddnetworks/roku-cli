@@ -1,6 +1,7 @@
-package main
+package commands
 
 import (
+	"archive/zip"
 	"bytes"
 	"crypto/md5"
 	"encoding/hex"
@@ -14,21 +15,123 @@ import (
 	"strings"
 
 	"gopkg.in/urfave/cli.v1"
+
+	"github.com/oddnetworks/roku-cli/rc"
 )
+
+var requiredPaths []string = []string{"manifest", "source"}
+var allowedPaths []string = []string{"manifest", "source", "images", "components"}
 
 type authorization struct {
 	Username, Password, Realm, NONCE, QOP, Opaque, Algorithm string
+}
+
+func EnsurePaths(c *cli.Context) error {
+	if FS.Source == "" {
+		FS.Source = "./"
+	}
+
+	// Verify source folder contains required Roku files and folders
+	for _, required := range requiredPaths {
+		verifyPath := filepath.Join(FS.Source, required)
+		if _, err := os.Stat(verifyPath); os.IsNotExist(err) {
+			return cli.NewExitError("Not a valid Roku project. Missing: "+verifyPath, 1)
+		}
+	}
+
+	fmt.Println("Building from path:", FS.Source)
+
+	if FS.Destination == "" {
+		FS.Destination = filepath.Join(FS.Source, "build")
+	}
+
+	// Make the destination folder if it doesn't exist
+	if _, err := os.Stat(FS.Destination); os.IsNotExist(err) {
+		err = os.Mkdir(FS.Destination, os.ModePerm)
+	}
+
+	if FS.Zip == "" {
+		FS.Zip = filepath.Join(FS.Destination, "channel.zip")
+	} else {
+		FS.Zip = filepath.Join(FS.Destination, FS.Zip)
+	}
+
+	return nil
+}
+
+func Build(c *cli.Context) error {
+	// Make a new file handler and zip archive
+	zipFile, err := os.Create(FS.Zip)
+	if err != nil {
+		return cli.NewExitError("Zip file could not be created: "+err.Error(), 1)
+	}
+	defer zipFile.Close()
+
+	archive := zip.NewWriter(zipFile)
+	defer archive.Close()
+
+	// Walk the source path and add each path to the archive
+	err = filepath.Walk(FS.Source, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		for _, allowed := range allowedPaths {
+			if strings.Contains(path, allowed) {
+				header, err := zip.FileInfoHeader(info)
+				if err != nil {
+					return err
+				}
+
+				header.Name = strings.TrimPrefix(path, FS.Source+"/")
+
+				header.Method = zip.Store
+				if info.IsDir() {
+					header.Name += "/"
+				} else {
+					header.Method = zip.Deflate
+				}
+
+				writer, err := archive.CreateHeader(header)
+				if err != nil {
+					return err
+				}
+
+				if info.IsDir() {
+					return nil
+				}
+
+				file, err := os.Open(path)
+				if err != nil {
+					return err
+				}
+				defer file.Close()
+
+				_, err = io.Copy(writer, file)
+				return err
+			}
+		}
+
+		return err
+	})
+	if err != nil {
+		return cli.NewExitError("Error zipping: "+err.Error(), 1)
+	}
+
+	fmt.Println("Build complete:", FS.Zip)
+
+	return nil
 }
 
 func Install(c *cli.Context) error {
 	Build(c)
 
 	// Open the rc file and get the current device
-	rc, _ := NewRC()
-	device := rc.CurrentDevice()
+	config, _ := rc.LoadRC()
+	device := config.CurrentDevice()
 
 	// Open the zip file
-	zip, err := os.Open(fs.Zip)
+	zip, err := os.Open(FS.Zip)
 	if err != nil {
 		return cli.NewExitError("Error reading zip file: "+err.Error(), 1)
 	}
@@ -37,7 +140,7 @@ func Install(c *cli.Context) error {
 	// Build a form and add the zip binary file
 	form := &bytes.Buffer{}
 	writer := multipart.NewWriter(form)
-	part, err := writer.CreateFormFile("archive", filepath.Base(fs.Zip))
+	part, err := writer.CreateFormFile("archive", filepath.Base(FS.Zip))
 	if err != nil {
 		return cli.NewExitError("Error attaching zip file: "+err.Error(), 1)
 	}
